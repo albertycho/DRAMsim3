@@ -128,6 +128,7 @@ class Config {
     int cmd_queue_size;
     bool unified_queue;
     int trans_queue_size;
+    int prio_queue_size;
     int write_buf_size;
     bool enable_self_refresh;
     int sref_threshold;

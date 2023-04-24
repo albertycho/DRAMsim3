@@ -19,8 +19,8 @@ std::ostream& operator<<(std::ostream& os, const Command& cmd) {
         "self_refresh_enter",
         "self_refresh_exit",
         "WRONG"};
-    os << fmt::format("{:<20} {:>3} {:>3} {:>3} {:>3} {:>#8x} {:>#8x}",
-                      command_string[static_cast<int>(cmd.cmd_type)],
+    os << fmt::format("{:<20} {:>3} {:>3} {:>3} {:>3} {:>3} {:>#8x} {:>#8x}",
+                      command_string[static_cast<int>(cmd.cmd_type)], cmd.IsPrio(),
                       cmd.Channel(), cmd.Rank(), cmd.Bankgroup(), cmd.Bank(),
                       cmd.Row(), cmd.Column());
     return os;
@@ -28,15 +28,18 @@ std::ostream& operator<<(std::ostream& os, const Command& cmd) {
 
 std::ostream& operator<<(std::ostream& os, const Transaction& trans) {
     const std::string trans_type = trans.is_write ? "WRITE" : "READ";
-    os << fmt::format("{:<30} {:>8}", trans.addr, trans_type);
+    const std::string prio = trans.is_prio ? "PRIO" : "NPRIO";
+    os << fmt::format("{:<30} {:} {:>8}", trans.addr, trans_type, prio);
     return os;
 }
 
 std::istream& operator>>(std::istream& is, Transaction& trans) {
     std::unordered_set<std::string> write_types = {"WRITE", "write", "P_MEM_WR",
                                                    "BOFF"};
+  // Follows trace format:
+  // <addr> <mem_op> <cycle> <prio>
     std::string mem_op;
-    is >> std::hex >> trans.addr >> mem_op >> std::dec >> trans.added_cycle;
+    is >> std::hex >> trans.addr >> mem_op >> std::dec >> trans.added_cycle >> trans.is_prio;
     trans.is_write = write_types.count(mem_op) == 1;
     return is;
 }

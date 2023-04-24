@@ -224,6 +224,7 @@ void Config::InitSystemParams() {
     row_buf_policy = reader.Get("system", "row_buf_policy", "OPEN_PAGE");
     cmd_queue_size = GetInteger("system", "cmd_queue_size", 16);
     trans_queue_size = GetInteger("system", "trans_queue_size", 32);
+    prio_queue_size = GetInteger("system", "prio_queue_size", 32);
     unified_queue = reader.GetBoolean("system", "unified_queue", false);
     write_buf_size = GetInteger("system", "write_buf_size", 16);
     std::string ref_policy =

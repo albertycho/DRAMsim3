@@ -28,7 +28,7 @@ class Controller {
     Controller(int channel, const Config &config, const Timing &timing);
 #endif  // THERMAL
     void ClockTick();
-    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const;
+    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write, bool is_prio) const;
     bool AddTransaction(Transaction trans);
     int QueueUsage() const;
     // Stats output
@@ -57,6 +57,9 @@ class Controller {
     std::vector<Transaction> read_queue_;
     std::vector<Transaction> write_buffer_;
 
+    std::vector<Transaction> prio_unified_queue_;
+    std::vector<Transaction> prio_read_queue_;
+    std::vector<Transaction> prio_write_buffer_;
     // transactions that are not completed, use map for convenience
     std::multimap<uint64_t, Transaction> pending_rd_q_;
     std::multimap<uint64_t, Transaction> pending_wr_q_;

@@ -23,12 +23,13 @@ class MemorySystem {
     double GetTCK() const;
     int GetBusBits() const;
     int GetBurstLength() const;
-    int GetQueueSize() const;
+    int GetTransQueueSize() const;
+    int GetPrioQueueSize() const;
     void PrintStats() const;
     void ResetStats();
 
-    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const;
-    bool AddTransaction(uint64_t hex_addr, bool is_write);
+    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write, bool is_prio) const;
+    bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_prio);
 
    private:
     // These have to be pointers because Gem5 will try to push this object

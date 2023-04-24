@@ -66,9 +66,10 @@ enum class CommandType {
 };
 
 struct Command {
-    Command() : cmd_type(CommandType::SIZE), hex_addr(0) {}
-    Command(CommandType cmd_type, const Address& addr, uint64_t hex_addr)
-        : cmd_type(cmd_type), addr(addr), hex_addr(hex_addr) {}
+    Command() : cmd_type(CommandType::SIZE), is_prio(false), hex_addr(0) {}
+    Command(CommandType cmd_type, const Address& addr, uint64_t hex_addr,
+            bool is_prio)
+        : cmd_type(cmd_type), is_prio(is_prio), addr(addr), hex_addr(hex_addr) {}
     // Command(const Command& cmd) {}
 
     bool IsValid() const { return cmd_type != CommandType::SIZE; }
@@ -84,6 +85,7 @@ struct Command {
         return cmd_type == CommandType ::WRITE ||
                cmd_type == CommandType ::WRITE_PRECHARGE;
     }
+    bool IsPrio() const { return is_prio; }
     bool IsReadWrite() const { return IsRead() || IsWrite(); }
     bool IsRankCMD() const {
         return cmd_type == CommandType::REFRESH ||
@@ -91,6 +93,7 @@ struct Command {
                cmd_type == CommandType::SREF_EXIT;
     }
     CommandType cmd_type;
+    bool is_prio;
     Address addr;
     uint64_t hex_addr;
 
@@ -106,20 +109,23 @@ struct Command {
 
 struct Transaction {
     Transaction() {}
-    Transaction(uint64_t addr, bool is_write)
+    Transaction(uint64_t addr, bool is_write, bool is_prio)
         : addr(addr),
           added_cycle(0),
           complete_cycle(0),
-          is_write(is_write) {}
+          is_write(is_write),
+          is_prio(is_prio) {}
     Transaction(const Transaction& tran)
         : addr(tran.addr),
           added_cycle(tran.added_cycle),
           complete_cycle(tran.complete_cycle),
-          is_write(tran.is_write) {}
+          is_write(tran.is_write),
+          is_prio(tran.is_prio){}
     uint64_t addr;
     uint64_t added_cycle;
     uint64_t complete_cycle;
     bool is_write;
+    bool is_prio;
 
     friend std::ostream& operator<<(std::ostream& os, const Transaction& trans);
     friend std::istream& operator>>(std::istream& is, Transaction& trans);

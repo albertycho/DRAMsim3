@@ -75,6 +75,9 @@ SimpleStats::SimpleStats(const Config& config, int channel_id)
              "Average read request latency (cycles)");
     InitStat("average_interarrival", "calculated",
              "Average request interarrival latency (cycles)");
+
+    InitStat("prio_trans_done", "counter", "Number of prio transactions completed");
+    InitStat("num_prio_cmds", "counter", "Number of prio transactions commands");
 }
 
 void SimpleStats::AddValue(const std::string name, const int value) {

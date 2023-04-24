@@ -15,7 +15,7 @@ TEST_CASE("Jedec DRAMSystem Testing", "[dramsim3]") {
                                       dummy_call_back);
 
     SECTION("TEST interaction with controller") {
-        dramsys.AddTransaction(1, false);
+        dramsys.AddTransaction(1, false, false);
         int clk = 0;
         while (true) {
             dramsys.ClockTick();

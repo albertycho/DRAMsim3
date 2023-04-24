@@ -21,7 +21,7 @@ class CommandQueue {
     Command GetCommandToIssue();
     Command FinishRefresh();
     void ClockTick() { clk_ += 1; };
-    bool WillAcceptCommand(int rank, int bankgroup, int bank) const;
+    bool WillAcceptCommand(int rank, int bankgroup, int bank, bool is_prio) const;
     bool AddCommand(Command cmd);
     bool QueueEmpty() const;
     int QueueUsage() const;
@@ -34,8 +34,8 @@ class CommandQueue {
                          const CMDQueue& queue) const;
     Command GetFirstReadyInQueue(CMDQueue& queue) const;
     int GetQueueIndex(int rank, int bankgroup, int bank) const;
-    CMDQueue& GetQueue(int rank, int bankgroup, int bank);
-    CMDQueue& GetNextQueue();
+    CMDQueue& GetQueue(int rank, int bankgroup, int bank, bool is_prio);
+    CMDQueue& GetNextQueue(bool is_prio);
     void GetRefQIndices(const Command& ref);
     void EraseRWCommand(const Command& cmd);
     Command PrepRefCmd(const CMDIterator& it, const Command& ref) const;
@@ -45,6 +45,7 @@ class CommandQueue {
     const ChannelState& channel_state_;
     SimpleStats& simple_stats_;
 
+    std::vector<CMDQueue> prio_queues_;
     std::vector<CMDQueue> queues_;
 
     // Refresh related data structures
@@ -54,6 +55,7 @@ class CommandQueue {
     int num_queues_;
     size_t queue_size_;
     int queue_idx_;
+    int prio_queue_idx_;
     uint64_t clk_;
 };
 

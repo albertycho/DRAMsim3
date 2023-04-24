@@ -86,6 +86,7 @@ class HMCRequest {
     int vault;
     int flits;
     bool is_write;
+    bool is_prio;
     // this exit_time is the time to exit xbar to vaults
     uint64_t exit_time;
 };
@@ -114,8 +115,8 @@ class HMCMemorySystem : public BaseDRAMSystem {
     void ClockTick() override;
 
     // had to have 3 insert interfaces cuz HMC is so different...
-    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write) const override;
-    bool AddTransaction(uint64_t hex_addr, bool is_write) override;
+    bool WillAcceptTransaction(uint64_t hex_addr, bool is_write, bool is_prio) const override;
+    bool AddTransaction(uint64_t hex_addr, bool is_write, bool is_prio) override;
     bool InsertReqToLink(HMCRequest* req, int link);
     bool InsertHMCReq(HMCRequest* req);
 

@@ -17,7 +17,7 @@ TEST_CASE("HMC System Testing", "[dramsim3][hmc]") {
 
     SECTION("TEST HMC interaction with controller") {
         REQUIRE(hmc.GetBurstLength() == 16);
-        hmc.AddTransaction(1, false);
+        hmc.AddTransaction(1, false, false);
         int clk = 0;
         while (true) {
             hmc.ClockTick();

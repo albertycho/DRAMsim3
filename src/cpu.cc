@@ -6,14 +6,16 @@ void RandomCPU::ClockTick() {
     // Create random CPU requests at full speed
     // this is useful to exploit the parallelism of a DRAM protocol
     // and is also immune to address mapping and scheduling policies
+  // TODO: Prio passing here? Can just do random since this is random anyway
     memory_system_.ClockTick();
     if (get_next_) {
         last_addr_ = gen();
         last_write_ = (gen() % 3 == 0);
     }
-    get_next_ = memory_system_.WillAcceptTransaction(last_addr_, last_write_);
+    bool default_prio = false;
+    get_next_ = memory_system_.WillAcceptTransaction(last_addr_, last_write_, default_prio);
     if (get_next_) {
-        memory_system_.AddTransaction(last_addr_, last_write_);
+        memory_system_.AddTransaction(last_addr_, last_write_, default_prio);
     }
     clk_++;
     return;
@@ -25,6 +27,8 @@ void StreamCPU::ClockTick() {
     // enough buffer hits
 
     // moving on to next set of arrays
+    // TODO: Check how to pass prio here. Is it needed? Or can I ignore since its
+    // streamcpu not trace
     memory_system_.ClockTick();
     if (offset_ >= array_size_ || clk_ == 0) {
         addr_a_ = gen();
@@ -33,19 +37,20 @@ void StreamCPU::ClockTick() {
         offset_ = 0;
     }
 
+  bool default_prio = false;
     if (!inserted_a_ &&
-        memory_system_.WillAcceptTransaction(addr_a_ + offset_, false)) {
-        memory_system_.AddTransaction(addr_a_ + offset_, false);
+        memory_system_.WillAcceptTransaction(addr_a_ + offset_, false, default_prio)) {
+        memory_system_.AddTransaction(addr_a_ + offset_, false, default_prio);
         inserted_a_ = true;
     }
     if (!inserted_b_ &&
-        memory_system_.WillAcceptTransaction(addr_b_ + offset_, false)) {
-        memory_system_.AddTransaction(addr_b_ + offset_, false);
+        memory_system_.WillAcceptTransaction(addr_b_ + offset_, false, default_prio)) {
+        memory_system_.AddTransaction(addr_b_ + offset_, false, default_prio);
         inserted_b_ = true;
     }
     if (!inserted_c_ &&
-        memory_system_.WillAcceptTransaction(addr_c_ + offset_, true)) {
-        memory_system_.AddTransaction(addr_c_ + offset_, true);
+        memory_system_.WillAcceptTransaction(addr_c_ + offset_, true, default_prio)) {
+        memory_system_.AddTransaction(addr_c_ + offset_, true, default_prio);
         inserted_c_ = true;
     }
     // moving on to next element
@@ -79,9 +84,10 @@ void TraceBasedCPU::ClockTick() {
         }
         if (trans_.added_cycle <= clk_) {
             get_next_ = memory_system_.WillAcceptTransaction(trans_.addr,
-                                                             trans_.is_write);
+                                                             trans_.is_write,
+                                                             trans_.is_prio);
             if (get_next_) {
-                memory_system_.AddTransaction(trans_.addr, trans_.is_write);
+                memory_system_.AddTransaction(trans_.addr, trans_.is_write, trans_.is_prio);
             }
         }
     }
